@@ -36,14 +36,22 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           name: production-files
           path: ./dist
 
-      - name: Copy mech_hangar to dist
-        run: cp -r ./mech_hangar ./dist
+      - name: Copy mech_hangar folder
+        run: |
+          git fetch origin main
+          git checkout origin/main -- mech_hangar
+          cp -r mech_hangar dist/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
