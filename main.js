@@ -16,7 +16,7 @@ renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.render(scene, camera)
 
 const loader = new GLTFLoader()
-loader.load( 'mech_hangar/scene.gltf', function ( gltf ) {
+loader.load( 'models/scene.gltf', function ( gltf ) {
 
     scene.add( gltf.scene );
 

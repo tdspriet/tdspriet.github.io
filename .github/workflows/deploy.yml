@@ -47,11 +47,11 @@ jobs:
           name: production-files
           path: ./dist
 
-      - name: Copy mech_hangar folder
+      - name: Copy models folder
         run: |
           git fetch origin main
-          git checkout origin/main -- mech_hangar
-          cp -r mech_hangar dist/
+          git checkout origin/main -- models
+          cp -r models dist/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
