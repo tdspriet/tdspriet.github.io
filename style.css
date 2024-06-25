@@ -1,3 +1,8 @@
+@font-face {
+    font-family: crang;
+    src: url(fonts/crang.ttf);
+}
+
 canvas {
     position: fixed;
     top: 0;
@@ -5,6 +10,11 @@ canvas {
 }
 
 nav {
+    /* Gets changed when pressing enter */
+    display: none;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+
     position: fixed;
     top: 0;
     left: 50%;
@@ -13,9 +23,35 @@ nav {
     z-index: 1;
 }
 
+nav.visible {
+    display: block;
+    opacity: 1;
+}
+
 p {
+    font-family: crang, serif;
     color: white;
     text-align: center;
     font-size: 1.5em;
-    font-family: 'Roboto', sans-serif;
+    margin-top: 12px;
+}
+
+nav a {
+    text-decoration: none;
+    -webkit-user-select: none;  /* Chrome, Safari and Opera */
+    -moz-user-select: none;     /* Firefox */
+    -ms-user-select: none;      /* IE/Edge */
+    user-select: none;          /* Standard syntax */
+    -webkit-animation: glow 2s ease-in-out infinite alternate;
+    -moz-animation: glow 2s ease-in-out infinite alternate;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes glow {
+    from {
+        text-shadow: 0 0 4px rgba(255, 255, 255, 0.5), 0 0 9px rgba(255, 255, 255, 0.25), 0 0 13px rgba(255, 255, 255, 0.1);
+    }
+    to {
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.5), 0 0 5px rgba(255, 255, 255, 0.25), 0 0 9px rgba(255, 255, 255, 0.1);
+    }
 }

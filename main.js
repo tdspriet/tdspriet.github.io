@@ -7,6 +7,8 @@ import {
     OutlinePass, RenderPass, TextGeometry,
     UnrealBloomPass
 } from "three/addons";
+import { VignetteShader } from 'three/examples/jsm/shaders/VignetteShader.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 /* Scenes, camera, renderer and composer */
 const scene = new THREE.Scene();
@@ -15,7 +17,7 @@ scene.rotation.y = - Math.PI / 2; // Rotate to put scene in position
 
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.setZ(20);
-camera.position.setY(2.5);
+camera.position.setY(50);
 
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
@@ -25,10 +27,44 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new RenderPass(scene, camera)); // Default render
+const vignettePass = new ShaderPass(VignetteShader);
+vignettePass.uniforms["darkness"].value = 1.1;
+composer.addPass(vignettePass); // Vignitte render
 const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-composer.addPass(outlinePass);
-composer.addPass(new UnrealBloomPass(undefined, 1, 1.5, 0.5));
+composer.addPass(outlinePass); // Outline render
+composer.addPass(new UnrealBloomPass(undefined, 1, 1.5, 0.5)); // Bloom render
+
+let startScene = false; // Hold scene until user press enter
+
+
+/* Text maker and font loader */
+function createTextMesh(text, translateX=0, translateY=0, translateZ=0) {
+    const textGeometry = new TextGeometry(text, {
+        font: font,
+        size: 1,
+        depth: 0.05,
+    });
+    textGeometry.center()
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff});
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.translateX(translateX);
+    textMesh.translateY(translateY);
+    textMesh.translateZ(translateZ);
+    textMesh.rotation.y = Math.PI / 2;
+    scene.add(textMesh);
+}
+
+let font;
+const fontLoader = new FontLoader();
+fontLoader.load('fonts/crang.json', function (loadedFont) {
+    font = loadedFont;
+    createTextMesh("Press Enter to start", 0, 50, 0);
+    composer.render()
+    createTextMesh( "PORTFOLIO", 0, 10, 11);
+    createTextMesh( "ABOUT ME", 0, 10, 0);
+    createTextMesh( "EDUCATION", 0, 10, -11);
+});
 
 
 /* Raycaster */
@@ -51,36 +87,13 @@ modelloader.load('models/scene.gltf', function (gltf) {
 });
 
 
-/* Text loader*/
-function createTextMesh(text, translate) {
-    const textGeometry = new TextGeometry(text, {
-        font: font,
-        size: 1,
-        depth: 0.05,
-    });
-    textGeometry.center()
-    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff});
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-    textMesh.translateY(10);
-    textMesh.translateZ(translate)
-    textMesh.rotation.y = Math.PI / 2;
-    scene.add(textMesh);
-}
-let font;
-const fontLoader = new FontLoader();
-fontLoader.load('fonts/Crang_Regular.json', function (loadedFont) {
-    font = loadedFont;
-    createTextMesh( "PORTFOLIO", 11);
-    createTextMesh( "ABOUT ME", 0);
-    createTextMesh( "EDUCATION", -11);
-});
-
-
-
 /* Animation */
 let targetObject = null;
 var clockwise = false;
 function animate() {
+    if(!startScene) {
+        return;
+    }
     requestAnimationFrame(animate);
 
     // Camera and scene
@@ -146,6 +159,7 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
     outlinePass.setSize(window.innerWidth, window.innerHeight);
+    composer.render()
     updateBloomStrength();
 });
 
@@ -158,9 +172,6 @@ window.addEventListener('pointermove', function (event) {
 
 
 /* Mouse click tracker */
-const audio = new Audio('audio/song.mp3');
-audio.volume = 0;
-audio.loop = true;
 window.addEventListener('click', function () {
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
@@ -169,29 +180,18 @@ window.addEventListener('click', function () {
             || intersects[0].object.name === "AlphaUWU_AlphaUWU_0"
             || intersects[0].object.name === "Cube009_Blue_0")) {
         targetObject = intersects[0].object;
-
-        audio.play();
-        let fadeAudio = setInterval(function () {
-            if (audio.volume < 0.1) {
-                audio.volume += 0.001;
-            }
-            else {
-                clearInterval(fadeAudio);
-            }
-        }, 20);
     } else {
         targetObject = null;
     }
 });
 
 
-/* Bloom strength adjuster */
+/* Bloom strength adjuster (scaling is messed up otherwise) */
 function calculateBloomStrength() {
     // Adjust these values as needed
     const baseResolution = 1536 * 730;
     const baseStrength = 1;
     const currentResolution = window.innerWidth * window.innerHeight;
-    console.log(window.innerWidth, window.innerHeight, currentResolution);
     if(currentResolution > baseResolution) {
         return baseStrength * baseResolution / currentResolution;
     } else {
@@ -206,6 +206,28 @@ function updateBloomStrength() {
 }
 
 
-/* Main */
-updateBloomStrength();
-animate();
+/* Start scene and music */
+const audio = new Audio('audio/song.mp3');
+audio.volume = 0;
+audio.loop = true;
+window.addEventListener('keydown', function(event) {
+    if (event.keyCode === 13) {
+        startScene = true;
+        updateBloomStrength();
+        animate();
+        audio.play();
+        let fadeAudio = setInterval(function () {
+            if (audio.volume < 0.1) {
+                audio.volume += 0.01;
+            }
+            else {
+                clearInterval(fadeAudio);
+            }
+        }, 20);
+        const nav = document.querySelector('nav');
+        nav.style.display = 'block';
+        setTimeout(() => {
+            nav.classList.add('visible');
+        }, 0);
+    }
+});
