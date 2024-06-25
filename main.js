@@ -35,7 +35,26 @@ const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.
 composer.addPass(outlinePass); // Outline render
 composer.addPass(new UnrealBloomPass(undefined, 1, 1.5, 0.5)); // Bloom render
 
-let startScene = false; // Hold scene until user press enter
+let started = false; // Hold scene until user press enter
+function startScene() {
+    started = true;
+    updateBloomStrength();
+    animate();
+    audio.play();
+    let fadeAudio = setInterval(function () {
+        if (audio.volume < 0.1) {
+            audio.volume += 0.01;
+        }
+        else {
+            clearInterval(fadeAudio);
+        }
+    }, 20);
+    const nav = document.querySelector('nav');
+    nav.style.display = 'block';
+    setTimeout(() => {
+        nav.classList.add('visible');
+    }, 0);
+}
 
 
 /* Text maker and font loader */
@@ -91,7 +110,7 @@ modelloader.load('models/scene.gltf', function (gltf) {
 let targetObject = null;
 var clockwise = false;
 function animate() {
-    if(!startScene) {
+    if(!started) {
         return;
     }
     requestAnimationFrame(animate);
@@ -172,7 +191,15 @@ window.addEventListener('pointermove', function (event) {
 
 
 /* Mouse click tracker */
+/* TODO:
+    When double-clicking a mech you zoomed in on, it will turn away from the mech and translate you inside the mech
+    from there a new scene ("/education" for example) will be displayed with the mech's interior and information
+*/
 window.addEventListener('click', function () {
+    if(!started) {
+        startScene();
+        return;
+    }
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     if (intersects.length > 0 &&
@@ -211,23 +238,7 @@ const audio = new Audio('audio/song.mp3');
 audio.volume = 0;
 audio.loop = true;
 window.addEventListener('keydown', function(event) {
-    if (event.keyCode === 13) {
-        startScene = true;
-        updateBloomStrength();
-        animate();
-        audio.play();
-        let fadeAudio = setInterval(function () {
-            if (audio.volume < 0.1) {
-                audio.volume += 0.01;
-            }
-            else {
-                clearInterval(fadeAudio);
-            }
-        }, 20);
-        const nav = document.querySelector('nav');
-        nav.style.display = 'block';
-        setTimeout(() => {
-            nav.classList.add('visible');
-        }, 0);
+    if (event.keyCode === 13 && !started) {
+        startScene();
     }
 });
