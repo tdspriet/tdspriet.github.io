@@ -146,6 +146,7 @@ window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
     outlinePass.setSize(window.innerWidth, window.innerHeight);
+    updateBloomStrength();
 });
 
 
@@ -183,5 +184,21 @@ window.addEventListener('click', function () {
     }
 });
 
+/* Bloom strength adjuster */
+function calculateBloomStrength() {
+    // Adjust these values as needed
+    const baseResolution = 1536 * 730;
+    const baseStrength = 1;
+    const currentResolution = window.innerWidth * window.innerHeight;
+    return baseStrength * baseResolution / currentResolution;
+}
+function updateBloomStrength() {
+    const bloomPass = composer.passes.find(pass => pass instanceof UnrealBloomPass);
+    if (bloomPass) {
+        bloomPass.strength = calculateBloomStrength();
+    }
+}
+
 /* Main */
+updateBloomStrength();
 animate();
