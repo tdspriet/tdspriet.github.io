@@ -113,7 +113,7 @@ function animate() {
         const cameraZ = Math.abs(maxDim / 2 * Math.tan(fov * 2));
         camera.position.lerp(new THREE.Vector3(
             center.x,
-            center.y,
+            center.y - 0.25,
             center.z + cameraZ + 4.5
         ), 0.05);
         // Stop scene rotation
@@ -157,7 +157,10 @@ window.addEventListener('pointermove', function (event) {
 
 
 /* Mouse click tracker */
-window.addEventListener('click', function (event) {
+const audio = new Audio('audio/song.mp3');
+audio.volume = 0;
+audio.loop = true;
+window.addEventListener('click', function () {
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
     if (intersects.length > 0 &&
@@ -165,26 +168,20 @@ window.addEventListener('click', function (event) {
             || intersects[0].object.name === "AlphaUWU_AlphaUWU_0"
             || intersects[0].object.name === "Cube009_Blue_0")) {
         targetObject = intersects[0].object;
+
+        audio.play();
+        let fadeAudio = setInterval(function () {
+            if (audio.volume < 0.1) {
+                audio.volume += 0.001;
+            }
+            else {
+                clearInterval(fadeAudio);
+            }
+        }, 20);
     } else {
         targetObject = null;
     }
 });
-
-
-/* Audio */
-const audio = new Audio('audio/song.mp3');
-audio.volume = 0;
-audio.loop = true;
-audio.play();
-let fadeAudio = setInterval(function () {
-    if (audio.volume < 0.1) {
-        audio.volume += 0.001;
-    }
-    else {
-        clearInterval(fadeAudio);
-    }
-}, 20);
-
 
 /* Main */
 animate();
