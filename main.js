@@ -195,7 +195,7 @@ function calculateBloomStrength() {
     if(currentResolution > baseResolution) {
         return baseStrength * baseResolution / currentResolution;
     } else {
-        return baseStrength;
+        return baseStrength * currentResolution / baseResolution;
     }
 }
 function updateBloomStrength() {
