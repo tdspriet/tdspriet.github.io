@@ -3,11 +3,12 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import {
-    OutlinePass, RenderPass,
+    FontLoader,
+    OutlinePass, RenderPass, TextGeometry,
     UnrealBloomPass
 } from "three/addons";
 
-/* Scene, camera, renderer and composer */
+/* Scenes, camera, renderer and composer */
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x40495a);
 scene.rotation.y = - Math.PI / 2; // Rotate to put scene in position
@@ -27,7 +28,7 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
 composer.addPass(outlinePass);
-composer.addPass(new UnrealBloomPass(undefined, 1, 1, 0.5));
+composer.addPass(new UnrealBloomPass(undefined, 1, 1.5, 0.5));
 
 
 /* Raycaster */
@@ -48,6 +49,32 @@ modelloader.load('models/scene.gltf', function (gltf) {
 }, undefined, function (error) {
     console.error(error);
 });
+
+
+/* Text loader*/
+function createTextMesh(text, translate) {
+    const textGeometry = new TextGeometry(text, {
+        font: font,
+        size: 1,
+        depth: 0.05,
+    });
+    textGeometry.center()
+    const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff});
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.translateY(10);
+    textMesh.translateZ(translate)
+    textMesh.rotation.y = Math.PI / 2;
+    scene.add(textMesh);
+}
+let font;
+const fontLoader = new FontLoader();
+fontLoader.load('fonts/Crang_Regular.json', function (loadedFont) {
+    font = loadedFont;
+    createTextMesh( "PORTFOLIO", 11);
+    createTextMesh( "ABOUT ME", 0);
+    createTextMesh( "EDUCATION", -11);
+});
+
 
 
 /* Animation */
@@ -87,7 +114,7 @@ function animate() {
         camera.position.lerp(new THREE.Vector3(
             center.x,
             center.y,
-            center.z + cameraZ + 5
+            center.z + cameraZ + 4.5
         ), 0.05);
         // Stop scene rotation
         scene.rotation.y = THREE.MathUtils.lerp(scene.rotation.y, - Math.PI / 2, 0.05);
@@ -142,6 +169,21 @@ window.addEventListener('click', function (event) {
         targetObject = null;
     }
 });
+
+
+/* Audio */
+const audio = new Audio('audio/song.mp3');
+audio.volume = 0;
+audio.loop = true;
+audio.play();
+let fadeAudio = setInterval(function () {
+    if (audio.volume < 0.1) {
+        audio.volume += 0.001;
+    }
+    else {
+        clearInterval(fadeAudio);
+    }
+}, 20);
 
 
 /* Main */
