@@ -184,13 +184,19 @@ window.addEventListener('click', function () {
     }
 });
 
+
 /* Bloom strength adjuster */
 function calculateBloomStrength() {
     // Adjust these values as needed
     const baseResolution = 1536 * 730;
     const baseStrength = 1;
     const currentResolution = window.innerWidth * window.innerHeight;
-    return baseStrength * baseResolution / currentResolution;
+    console.log(window.innerWidth, window.innerHeight, currentResolution);
+    if(currentResolution > baseResolution) {
+        return baseStrength * baseResolution / currentResolution;
+    } else {
+        return baseStrength;
+    }
 }
 function updateBloomStrength() {
     const bloomPass = composer.passes.find(pass => pass instanceof UnrealBloomPass);
@@ -198,6 +204,7 @@ function updateBloomStrength() {
         bloomPass.strength = calculateBloomStrength();
     }
 }
+
 
 /* Main */
 updateBloomStrength();
