@@ -65,12 +65,6 @@ jobs:
           git checkout origin/main -- audio
           cp -r audio dist/
 
-      - name: Copy public folder
-        run: |
-          git fetch origin main
-          git checkout origin/main -- public
-          cp -r public dist/
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
