@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./grass.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valentijn</title>
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+      <div class="login-container">
+        <h1>💕 Welkom 💕</h1>
+        <div class="input-group">
+          <label for="firstName">Voornaam</label>
+          <input type="text" id="firstName" placeholder="Voer je voornaam in..." />
+        </div>
+        <div class="input-group">
+          <label for="lastName">Achternaam</label>
+          <input type="text" id="lastName" placeholder="Voer je achternaam in..." />
+        </div>
+        <button id="loginBtn">Enter</button>
+        <p id="error-msg"></p>
+      </div>
+    </div>
+
+    <!-- Main Experience -->
+    <div id="main-experience" style="display: none;">
+      <canvas id="bg"></canvas>
+      
+      <!-- Floating plushies container -->
+      <div id="plushies-container"></div>
+      
+      <!-- Question overlay -->
+      <div id="question-overlay" style="display: none;">
+        <h2>Liefste Jill, Wil je mijn valentijn zijn?</h2>
+        <div class="button-container">
+          <button id="jaBtn">Ja</button>
+          <button id="neeBtn">Nee</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final Screen -->
+    <div id="final-screen" style="display: none;">
+      <img id="final-gif" src="gif/love.gif" alt="Love" />
+      <h1 id="final-text">Ik zie je op 14 februari!</h1>
+    </div>
+
+    <script type="module" src="valentine.js"></script>
+  </body>
+</html>

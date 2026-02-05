@@ -65,6 +65,18 @@ jobs:
           git checkout origin/main -- audio
           cp -r audio dist/
 
+      - name: Copy img folder
+        run: |
+          git fetch origin main
+          git checkout origin/main -- img
+          cp -r img dist/
+
+      - name: Copy gif folder
+        run: |
+          git fetch origin main
+          git checkout origin/main -- gif
+          cp -r gif dist/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
