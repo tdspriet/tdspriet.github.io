@@ -32,7 +32,7 @@ const neePhrases = [
     "Please ik zie je graag...",
     "Alsjeblieft? 🥺",
     "Voor Teun 🥺🥺🥺",
-    "🥺🥺🥺🥺🥺"
+    "🥺"
 ];
 let neeIndex = 0;
 let jaScale = 1;
